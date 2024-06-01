@@ -14,10 +14,12 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.4.2",
+    "@nextui-org/link": "^2.0.31",
     "@nextui-org/react": "^2.4.1",
     "@tanstack/react-query": "^5.40.0",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.2.10",
+    "lucide-react": "^0.381.0",
     "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
