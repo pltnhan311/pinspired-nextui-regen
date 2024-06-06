@@ -12,6 +12,7 @@ import {
 } from '@nextui-org/react';
 import { AcmeLogo } from '~/components/acme-logo';
 import { NavLink } from 'react-router-dom';
+import { ThemeSwitcher } from '~/components/theme-provider';
 
 export default function HeaderAuth() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -37,24 +38,25 @@ export default function HeaderAuth() {
           <p className='font-bold text-inherit'>ACME</p>
         </NavbarBrand>
         <NavbarItem>
-          <Button as={NavLink} color='default' to='/explore' variant='flat'>
+          <Button as={NavLink} color='default' to='/explore' variant='light' className='text-ft'>
             Explore
           </Button>
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify='end'>
-        <NavbarItem isActive>
-          <Link href='/' aria-current='page'>
-            Giới thiệu
-          </Link>
-        </NavbarItem>
         <NavbarItem>
-          <NavLink color='foreground' to='/'>
-            Điều khoản
+          <NavLink to='/about' aria-current='page' className='text-ft'>
+            About us
           </NavLink>
         </NavbarItem>
-        <NavbarItem className='hidden lg:flex'>
+        <NavbarItem className='hidden md:flex mr-2'>
+          <NavLink color='foreground' to='/terms' className='text-ft'>
+            Terms
+          </NavLink>
+        </NavbarItem>
+        <ThemeSwitcher />
+        <NavbarItem>
           <Button as={NavLink} color='danger' to='/login' variant='solid'>
             Login
           </Button>

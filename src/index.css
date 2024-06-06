@@ -10,6 +10,11 @@
     @apply m-0 box-border p-0 font-lexend;
   }
 
+  body {
+    /* @apply bg-[#1a1a1a] text-[#f0f0f0] h-screen; */
+    /* @apply min-h-screen; */
+  }
+
   /* Customize scroll bar */
   * ::-webkit-scrollbar {
     @apply w-4;

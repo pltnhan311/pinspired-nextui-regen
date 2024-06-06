@@ -3,39 +3,59 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Checkbox, Image, Input,
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
 import { NavLink } from 'react-router-dom';
+import { UserApi } from '~/api/user-api';
+import { useLogin } from '~/hooks/Auth/use-login';
 import { RegisterSchema, TRegisterFields } from '~/schema';
+import { loginFailed, loginStart, loginSuccess } from '~/store/slice/AuthSlice';
+import { fetchUserSuccess } from '~/store/slice/UserSlice';
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset
+    setError,
+    formState: { errors }
   } = useForm<TRegisterFields>({
     resolver: zodResolver(RegisterSchema)
   });
   const [isVisible, setIsVisible] = useState(false);
 
+  const { mutateAsync: loginAccount, isPending: loginAccountPending } = useLogin();
+
   const onSubmit: SubmitHandler<TRegisterFields> = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      dispatch(loginStart());
+      const res = await loginAccount(data, {
+        onError(error) {
+          // @ts-expect-error emsg
+          const formError = error.response.data.message;
+          setError('root', {
+            type: 'Server',
+            message: formError
+          });
+        }
+      });
+      if (res.data.statusCode === 200) {
+        dispatch(loginSuccess(res.data));
+
+        const { data } = await UserApi.getUserInformation(res.data?.data?.Email as string);
+
+        dispatch(fetchUserSuccess(data));
+      }
     } catch (error) {
       console.log(error);
+      dispatch(loginFailed());
     }
-
-    console.log(data);
-    reset();
   };
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className='flex flex-col h-screen justify-center items-center bg-neutral-100'
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col h-screen justify-center items-center'>
       <Card className='w-full max-w-md p-5'>
-        <CardHeader className='flex flex-col gap-1'>
+        <CardHeader className='flex flex-col gap-1 mb-1'>
           <Image
             alt='nextui logo'
             height={40}
@@ -43,8 +63,8 @@ export default function LoginPage() {
             src='https://avatars.githubusercontent.com/u/86160567?s=200&v=4'
             width={40}
           />
-          <h4 className='font-bold text-large'>Welcome Back</h4>
-          <p className='text-tiny font-medium'>Log in to your account to continue</p>
+          <h4 className='font-bold text-xl'>Welcome Back</h4>
+          <p className='text-sm font-medium'>Log in to your account to continue</p>
         </CardHeader>
         <CardBody className='space-y-4'>
           <div className='space-y-2'>
@@ -56,8 +76,6 @@ export default function LoginPage() {
               placeholder='Enter your email'
               labelPlacement='outside'
               variant='bordered'
-              isInvalid={!!errors?.Email?.message}
-              errorMessage={errors?.Email?.message}
             />
           </div>
           <div className='space-y-2'>
@@ -78,10 +96,11 @@ export default function LoginPage() {
               className='w-full'
               placeholder='Enter your password'
               labelPlacement='outside'
-              isInvalid={!!errors?.Password?.message}
-              errorMessage={errors?.Password?.message}
             />
           </div>
+          {errors?.root?.message && (
+            <p className='p-2 bg-red-100/70 rounded-md text-xs text-[#f31260]'>{errors?.root?.message}</p>
+          )}
           <div className='flex py-2 px-1 justify-between'>
             <Checkbox
               classNames={{
@@ -97,11 +116,11 @@ export default function LoginPage() {
         </CardBody>
         <CardFooter className='flex flex-col space-y-2'>
           <Button
-            disabled={isSubmitting}
+            isDisabled={loginAccountPending}
             type='submit'
             className='w-full bg-softblack text-white hover:bg-black/90 font-medium'
           >
-            {isSubmitting ? 'Loading...' : 'Login'}
+            {loginAccountPending ? 'Loading...' : 'Login'}
           </Button>
         </CardFooter>
       </Card>

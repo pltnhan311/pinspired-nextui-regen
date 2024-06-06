@@ -25,9 +25,3 @@ export const RegisterSchema = z.object({
 });
 
 export type TRegisterFields = z.infer<typeof RegisterSchema>;
-
-// export const LoginSchema = z.object({
-//   Email: z.string().email({
-
-//   })
-// })

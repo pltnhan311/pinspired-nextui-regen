@@ -4,28 +4,38 @@ import { Eye, EyeOff, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { NavLink } from 'react-router-dom';
+import { useCreateAccount } from '~/hooks/Auth/use-create-account';
 import { TRegisterFields, RegisterSchema } from '~/schema';
 
 export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
-    reset
+    setError,
+    formState: { errors }
   } = useForm<TRegisterFields>({
     resolver: zodResolver(RegisterSchema)
   });
   const [isVisible, setIsVisible] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+
+  const { mutateAsync: createAccount, isPending: createAccountPending } = useCreateAccount();
 
   const onSubmit: SubmitHandler<TRegisterFields> = async (data) => {
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      createAccount(data, {
+        onError(error) {
+          // @ts-expect-error emsg
+          const formError = error.response.data.message;
+          setError('root', {
+            type: 'Server',
+            message: formError
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
     }
-
-    console.log(data);
-    reset();
   };
 
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -35,7 +45,7 @@ export default function RegisterPage() {
       className='flex flex-col h-screen justify-center items-center bg-neutral-100'
     >
       <Card className='w-full max-w-md p-5'>
-        <CardHeader className='flex flex-col gap-1'>
+        <CardHeader className='flex flex-col gap-1 mb-1'>
           <Image
             alt='nextui logo'
             height={40}
@@ -43,8 +53,8 @@ export default function RegisterPage() {
             src='https://avatars.githubusercontent.com/u/86160567?s=200&v=4'
             width={40}
           />
-          <h4 className='font-bold text-large'>Welcome</h4>
-          <p className='text-tiny font-medium'>Create an account to get started</p>
+          <h4 className='font-bold text-xl'>Welcome</h4>
+          <p className='text-sm font-medium'>Create an account to get started</p>
         </CardHeader>
         <CardBody className='space-y-4'>
           <div className='space-y-2'>
@@ -82,8 +92,13 @@ export default function RegisterPage() {
               errorMessage={errors?.Password?.message}
             />
           </div>
-          <div className='flex px-1 justify-between'>
+          {errors?.root?.message && (
+            <p className='p-2 bg-red-100/70 rounded-md text-xs text-[#f31260]'>{errors?.root?.message}</p>
+          )}
+          <div className='flex py-2 px-1 justify-between'>
             <Checkbox
+              isSelected={isSelected}
+              onValueChange={setIsSelected}
               classNames={{
                 label: 'text-small'
               }}
@@ -101,11 +116,11 @@ export default function RegisterPage() {
         </CardBody>
         <CardFooter className='flex flex-col space-y-2'>
           <Button
-            disabled={isSubmitting}
+            isDisabled={createAccountPending || !isSelected}
             type='submit'
             className='w-full bg-softblack text-white hover:bg-black/90 font-medium'
           >
-            {isSubmitting ? 'Loading...' : 'Sign up'}
+            {createAccountPending ? 'Loading...' : 'Sign up'}
           </Button>
         </CardFooter>
       </Card>
