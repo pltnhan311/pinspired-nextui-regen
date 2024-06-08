@@ -3,7 +3,7 @@ import { Download, SendIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { usePost } from '~/hooks/Post/use-post';
 
-const DetailPostPage = () => {
+const DetailPost = () => {
   const { id } = useParams();
   const { data: post, isLoading } = usePost(id as string);
   const postData = post?.data;
@@ -20,9 +20,15 @@ const DetailPostPage = () => {
           </Breadcrumbs>
         </nav>
         <Skeleton isLoaded={!isLoading} className='rounded-lg'>
-          <div className='relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start bg-zinc-100 dark:bg-softblack rounded-xl'>
+          <div className='relative flex flex-col lg:grid lg:grid-cols-2 lg:items-start bg-zinc-100 dark:bg-softblack rounded-xl p-3'>
             <div className='w-full flex-none'>
-              <Image isZoomed alt='post picture' className='h-auto w-auto' src={postData?.Attachment?.Thumbnail} />
+              <Image
+                isZoomed
+                alt='post picture'
+                // width='70%'
+                className='max-h-fit w-screen'
+                src={postData?.Attachment?.Thumbnail}
+              />
             </div>
             <div className='flex flex-col justify-between p-7 h-full'>
               <div className='post-action flex items-center justify-between mb-5'>
@@ -161,4 +167,4 @@ function WriteComment() {
   );
 }
 
-export default DetailPostPage;
+export default DetailPost;

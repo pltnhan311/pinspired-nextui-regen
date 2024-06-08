@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor, store } from '~/store/store.ts';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
+import { MantineProvider } from '@mantine/core';
 
 const queryClient = new QueryClient();
 
@@ -17,12 +18,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <QueryClientProvider client={queryClient}>
-          <NextUIProvider>
-            <NextThemesProvider attribute='class' defaultTheme='light'>
-              <App />
-              <Toaster position='bottom-right' />
-            </NextThemesProvider>
-          </NextUIProvider>
+          <MantineProvider>
+            <NextUIProvider>
+              <NextThemesProvider attribute='class' defaultTheme='light'>
+                <App />
+                <Toaster position='bottom-right' />
+              </NextThemesProvider>
+            </NextUIProvider>
+          </MantineProvider>
         </QueryClientProvider>
       </PersistGate>
     </Provider>

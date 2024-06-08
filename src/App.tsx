@@ -17,8 +17,8 @@ import ProfilePage from '~/pages/profile-page';
 import RegisterPage from '~/pages/register-page';
 import SettingPage from '~/pages/setting-page';
 import { RootState } from '~/store/store';
-import DetailPostPage from '~/pages/detail-post';
-import CreatePostPage from '~/pages/create-post-page';
+import DetailPost from '~/pages/detail-post-page';
+import CreatePost from '~/pages/create-post-page';
 
 function ProtectedRoute() {
   const isSignedIn = useSelector((state: RootState) => state.Auth?.isSignedIn);
@@ -43,9 +43,9 @@ const router = createBrowserRouter(
         <Route path='' element={<MainLayout />}>
           <Route path='/' index={true} element={<HomePage />} />
           <Route path='/profile' element={<ProfilePage />} />
-          <Route path='/create' element={<CreatePostPage />} />
+          <Route path='/create' element={<CreatePost />} />
           <Route path='/setting' element={<SettingPage />} />
-          <Route path='/pin/:id' element={<DetailPostPage />} />
+          <Route path='/pin/:id' element={<DetailPost />} />
         </Route>
       </Route>
     </>

@@ -1,5 +1,13 @@
 import axiosClient from '~/api/axios-client';
+import { FileApi } from '~/api/file-api';
 import { IPost } from '~/types/types';
+
+interface IPostBody {
+  Title: string;
+  Description: string;
+  Attachment: { Id: string; Thumbnail: string };
+  IsComment: boolean;
+}
 
 export const PostApi = {
   async getPostsByCategory(pageIndex: number, pageSize: number) {
@@ -41,6 +49,21 @@ export const PostApi = {
       return data;
     } catch (error) {
       return { data: {} as IPost };
+    }
+  },
+
+  async createPost(file: File, postBody: IPostBody) {
+    try {
+      const upload = await FileApi.uploadFile(file);
+      if (upload && postBody?.Attachment) {
+        postBody.Attachment.Id = upload.data?.Attachment?.Id;
+        postBody.Attachment.Thumbnail = upload?.data?.ThumbnailPath || '';
+      }
+      const { data } = await axiosClient.post<{ data: IPost }>(`post/create-post`, postBody);
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.log(error); //
     }
   }
 };
